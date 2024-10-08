@@ -1,0 +1,30 @@
+name: Daily URL Check
+
+on:
+  schedule:
+    # 每天 UTC 时间 8:00 运行（可以根据你的时区调整）
+    - cron: '0 8 * * *'
+
+jobs:
+  check_urls:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Visit multiple URLs
+      run: |
+        # 定义需要访问的URL列表
+        urls=(
+          "https://dy.aaqq.site/api.php/timming/index.html?enforce=1&name=okziyuan"
+          "https://dy.aaqq.site/api.php/timming/index.html?enforce=1&name=yayaziyuan"
+          "https://dy.aaqq.site/api.php/timming/index.html?enforce=1&name=nnziyuan"
+          "https://dy.aaqq.site/"
+        )
+
+        # 使用curl访问每个URL
+        for url in "${urls[@]}"; do
+          echo "Visiting $url"
+          curl -I "$url"
+        done
