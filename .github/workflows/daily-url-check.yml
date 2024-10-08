@@ -3,7 +3,7 @@ name: Daily URL Check
 on:
   schedule:
     # 每天 UTC 时间 8:00 运行（可以根据你的时区调整）
-    - cron: '0 8 * * *'
+    - cron: '0 14 * * *'
 
 jobs:
   check_urls:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Visit multiple URLs
+    - name: Visit multiple URLs and check status
       run: |
         # 定义需要访问的URL列表
         urls=(
@@ -23,8 +23,17 @@ jobs:
           "https://dy.aaqq.site/"
         )
 
-        # 使用curl访问每个URL
+        # 使用curl访问每个URL并检查HTTP状态码
         for url in "${urls[@]}"; do
           echo "Visiting $url"
-          curl -I "$url"
+          # 获取HTTP状态码
+          status_code=$(curl -o /dev/null -s -w "%{http_code}" "$url")
+          
+          # 检查状态码是否为200
+          if [ "$status_code" -eq 200 ]; then
+            echo "✅ Success: $url returned $status_code"
+          else
+            echo "❌ Failure: $url returned $status_code"
+            exit 1  # 如果有失败，退出并标记为失败
+          fi
         done
